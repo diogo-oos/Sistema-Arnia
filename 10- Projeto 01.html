@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset='utf-8'>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="autor" content="Miguel Gastelumendi">	
+	<title>Objetivo - Arnia: Part 1</title>
+	<link rel="stylesheet" href="Projeto 01.css">
+</head>
+
+<body>
+    <script type="text/javascript">
+		var olMap = null;
+		var olGps = null;
+		var olFeatureCenter = null;
+		const iSrid = 4326;
+		function doMap() {
+			// Aqui part 1 mostrar imagem
+			var map= document.getElementById('idMapViewPort');
+			map.removeAttribute('hidden');
+		}
+
+		function centerMap() {
+		}
+
+		function changeLayer() {
+		}
+
+
+		function openGps() {
+		}
+
+	</script>
+
+	<img src="img/logo.png" alt="Arnia" id="logo">
+
+	<section id="area">
+		<div id="menu">
+            <div>
+                <button type="button" id="idDoMap" onClick="doMap()">Mostrar mapa</button>
+					 <br>
+                <button type="button" id="idChangeLayer" onClick="changeLayer()">Alterar Camada</button>
+					 <br>
+                <button type="button" id="idCenterMap" onClick="centerMap()">centralizar</button>
+					 <br>
+                <button type="button" id="idOpenGps" onClick="openGps()" disabled>GPS</button>
+            </div>
+
+			<div id="dados">
+				<div id="entrada">
+
+					<div class="labelFloat">
+						<input type="text" id="idLon" name="idLon" value='-43.9360313'>
+						<label for="idLon" class="input-label">Longitude</label>
+					</div>
+					<div class="labelFloat">
+						<input type="text" id="idLat" name="idLat" value='-19.9315584'>
+						<label for="idLat" class="input-label">Latidude</label>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</section>
+        
+	<section>
+		<div id="mapa">
+
+			<img id="idMapViewPort" src='img/mapa.png' hidden>		 
+
+        </div>
+	</section>	
+		
+    <footer>
+    </footer>
+
+
+</body>
+
+</html>
