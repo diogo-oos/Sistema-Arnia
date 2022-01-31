@@ -9,6 +9,22 @@ body{
     background-attachment: fixed;
 }
 
+/*Regras para a área*/
+#area{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+/*Regras para o menu*/
+#menu{
+    background-color: #ffffff80;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 2px 2px 1px 0px #00000070;
+}
+
 button{
     margin-bottom: 10px;
 }
@@ -33,7 +49,7 @@ input{
     margin-bottom: 5%;
 }
 
-input:focus{
+.float{
     border-bottom: 2px solid rgb(145, 145, 233);
 }
 
@@ -46,29 +62,13 @@ label{
     transition: all .3s ease-out;
 }
 
-.labelFloat input:focus + label{
+.labelFloat .float + label{
     font-size: 13px;
     margin-top: 0;
 }
 
 .active{
     margin-top: 0;
-}
-
-/*Regras para a área*/
-#area{
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    margin-bottom: 30px;
-}
-
-/*Regras para o menu*/
-#menu{
-    background-color: #ffffff80;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 2px 2px 1px 0px #00000070;
 }
 
 /*Regras para a imagem do mapa*/
