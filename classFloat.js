@@ -7,20 +7,27 @@ function verificarValor() {
     if (eidLon.value != 0) {
         eidLon.classList.add('float');
     }
-    console.log(eidLat.value);
+    
     if (eidLat.value != 0) {
         eidLat.classList.add('float');
     }
     
 }
 
-function adicionarClasseFloat() {
+function adicionarClasseFloatLon() {
     eidLon.classList.add('float');
+}
+
+function removerClasseFloatLon() {
+    eidLon.classList.remove('float');
+    verificarValor()
+}
+
+function adicionarClasseFloatLat() {
     eidLat.classList.add('float');
 }
 
-function removerClasseFloat() {
-    eidLon.classList.remove('float');
+function removerClasseFloatLat() {
     eidLat.classList.remove('float');
     verificarValor()
 }

@@ -123,6 +123,8 @@
 			} else {
 				olMap.getView().setCenter(aCenter);
 				console.log('Mapa centralizado: ' + aCenter);
+				let p = new ol.geom.Point(aCenter);
+				gpsInfo.feature.setGeometry(p);
 			}
 		}
 
@@ -153,6 +155,7 @@
 				/*if (iVisivel >= 0) {
 					olListaLayers[iVisivel].getVisible(iVisivel);
 				}*/
+				iPosicao++;
 				if (iPosicao == olListaLayers.length - 1) {
 					iPosicao = -1;
 				}
@@ -246,14 +249,14 @@
 				<div id="dados">
 					<div id="entrada">
 						<div class="labelFloat">
-							<input type="text" id="idLon" onfocus="adicionarClasseFloat()" onblur="removerClasseFloat()"
+							<input type="text" id="idLon" onfocus="adicionarClasseFloatLon()" onblur="removerClasseFloatLon()"
 								name="idLon" value='-43.9360313'>
 							<label for="idLon" class="input-label">Longitude</label>
 							
 						</div>
 
 						<div class="labelFloat">
-							<input type="text" id="idLat" onfocus="adicionarClasseFloat()" onblur="removerClasseFloat()"
+							<input type="text" id="idLat" onfocus="adicionarClasseFloatLat()" onblur="removerClasseFloatLat()"
 								name="idLat" value='-19.9315584'>
 							<label for="idLat" class="input-label">Latidude</label>
 							
