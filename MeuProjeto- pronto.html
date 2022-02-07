@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+	<meta charset='utf-8'>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="author" content="Miguel Gastelumendi">
+	<meta name="date" content="2022-02-02">
+	<meta name="description" content="Projeto final do Curso Frontend - Arnia">
+	<title>Projeto Final - Arnia: Part 1</title>
+
+	<script src="./api/ol.js"></script>
+	<link type="text/css" href="./api/ol.css" rel="stylesheet" />
+	<link rel="stylesheet" href="Projeto 01.css">
+
+</head>
+
+<body>
+
+	<!-- 01- Grupos de Trabalho juntos (líder ao meio)
+			0) Promessa/callback
+		 	1) Closure Compiler Google
+			2) Estrutura
+			3) Criar copia do original, trabalhar nela.
+				Exemplo: '01 Projeto- Inicio.html' -> '01 Projeto- Inicio- MeuTrabalho.html'
+				Quando terminamos uma secção (1-7), Salvar como '02 Projeto- GPS- MeuTrabalho.html'
+				Assim se algum ponto der errado, iniciar a secção no original
+			4) Na Segunda 6/2: 1) duvidas deste projeto, 2) Apresentação  de 10 -- 30 min
+			5) Sugestões?
+			6) Ver GPS
+	-->
+
+
+	<script>
+		/* --- Closure Compiler --
+			number,
+			https://github.com/google/closure-compiler/wiki/Types-in-the-Closure-Type-System
+			https://github.com/google/closure-compiler/wiki/Annotating-JavaScript-for-the-Closure-Compiler
+			https://github.com/google/closure-compiler/wiki/Annotating-Types
+		*/
+		var olMap = null;
+		var olGps = null;
+		var olFeatureCenter = null;
+		var iPosicao = -1;
+		const iSrid = 4326;
+		const gpsInfo = { feature: null, lat: 0, lon: 0, acu: 0, last: null, error: { msg: '', code: 0 }, ready: function () { return (this.error.code == 0); } };
+		const nome = 'nome';
+		
+		/** Disable/enable an element
+		 * @param {string} sId element's id
+		 * @param {bool} bEnable
+		 */
+		function btnEnable(sId, bEnable) {
+			document.getElementById(sId).disabled = !bEnable;
+		}
+		function doMap() {
+			btnEnable('idDoMap', false); //desativar o botão
+			let olLayers = [];
+			//window.console.warn('Mapa, só depois...');
+			let olTileBing = new ol.layer.Tile({
+				visible: false,
+				// https://docs.microsoft.com/en-us/bingmaps/rest-services/imagery/get-imagery-metadata AkhOFYyO_WwsChKykaICQAsqgMEj5ieTamlHeaDBOMlYPn2ny32oO0Q7ZLAiWN7X
+				source: new ol.source.BingMaps({ key: 'AlkyiwDg7LJtf3zc0M_ZwXvNR-oVV0xOPcdxPTywEd8QPUa4d-Kt3lor_kPf_0G6', imagerySet: 'AerialWithLabelsOnDemand', }),
+				preload: Infinity,
+			});
+			olTileBing.set(nome, 'Bing')
+			olLayers.push(olTileBing);
+
+			let olTileOsm = new ol.layer.Tile({
+				visible: false,
+				source: new ol.source.OSM(),
+			});
+			olTileOsm.set(nome, 'OSM')
+			olLayers.push(olTileOsm);
+
+
+			// Tiles: Open Topo Map
+			let olTileOtm = new ol.layer.Tile({
+				type: 'base',
+				visible: true,
+				source: new ol.source.XYZ({
+					url: 'https://{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png'
+				})
+			});
+			olTileOtm.set(nome, 'OpenTopo')
+			olLayers.push(olTileOtm);
+
+			olMap = new ol.Map({
+				layers: olLayers,
+				target: 'idMapViewPort',
+				view: new ol.View({
+					center: [0, 0], //aCenter,  // open Layer default 'EPSG:3857'; epsg.io
+					zoom: 1,//15,
+				})
+			});
+
+			gpsInfo.feature = new ol.Feature();
+			gpsInfo.feature.setStyle(new ol.style.Style({
+				image: new ol.style.Circle({
+					radius: 6,
+					fill: new ol.style.Fill({ color: 'DodgerBlue', }),
+					stroke: new ol.style.Stroke({ color: '#fff', width: 2, }),  // Shortcut 3-digits = #ffFFff
+				}),
+			}));
+
+			const olGpsLayer = new ol.layer.Vector({
+				map: olMap,
+				source: new ol.source.Vector({ features: [gpsInfo.feature], }),
+			});
+		}
+		/** Disable/enable an element
+		 * @param {Array} aCenter Map Coordinates in 'EPSG:3857'; https://openlayers.org/en/latest/apidoc/module-ol_View-View.html#setCenter
+		 */
+		function centerMap(aCenter) {
+			// TODO: olFeatureCenter.setGeometry(new ol.geom.Point(aCenter));
+			if (!aCenter) {
+				let nLat = document.getElementById('idLat').value;
+				let nLon = document.getElementById('idLon').value;
+				aCenter = ol.proj.fromLonLat([nLon, nLat]);
+			}
+			if (!olMap) {
+				window.alert('O mapa não está pronto.')
+			} else {
+				olMap.getView().setCenter(aCenter);
+				console.log('Mapa centralizado: ' + aCenter);
+			}
+		}
+
+		function changeLayer() {
+			// cSpell: word visivel
+			let olListaLayers = [];
+			let iVisivel = -1;
+			function processa(olLayer) {
+				iVisivel++;
+				let bVisivel = olLayer.getVisible();
+				if (bVisivel) { iPosicao = iVisivel; olLayer.setVisible(false); }
+
+				olListaLayers.push(olLayer);
+				console.log(olLayer.get(nome) + ' visível: ' + olLayer.getVisible());
+			}
+
+			olMap.getLayers().forEach(processa);
+
+			try {
+				// mudar visible a próxima
+				if (iPosicao == olListaLayers.length - 1) {
+					iPosicao = -1;
+				}
+				olListaLayers[iPosicao + 1].setVisible(true);
+
+			} catch (e) {  // Se ocorrer um erro não previsto, voltar com o layer que já era visivel.
+				console.error( /*TODO*/ e.message);
+				/*if (iVisivel >= 0) {
+					olListaLayers[iVisivel].getVisible(iVisivel);
+				}*/
+				if (iPosicao == olListaLayers.length - 1) {
+					iPosicao = -1;
+				}
+				olListaLayers[iPosicao + 1].setVisible(true);
+
+			}
+		}
+
+
+		function gpsCenter() {
+			if (!gpsInfo.ready) {
+				alert('GPS não está pronto.');  // TODO
+			} else if (!gpsInfo.feature) {
+				alert('Mapa não está pronto.');  // TODO
+			} else {
+				let aCoord = [gpsInfo.lon, gpsInfo.lat];   // !!!!
+				let c = ol.proj.fromLonLat(aCoord);
+				let p = new ol.geom.Point(c);
+				gpsInfo.feature.setGeometry(p);
+				console.log('aqui que estamos!');
+			}
+
+		}
+		/** GPS Success Callback function
+		 * @param {Object} gpsPos https://developer.mozilla.org/en-US/docs/Web/API/GeolocationCoordinates
+		 */
+		function gpsPosition(gpsPos) {
+			btnEnable('idOpenGps', true);
+			//window.console.log(gpsPos);
+			gpsInfo.error.msg.code = 0;
+			gpsInfo.lat = gpsPos.coords.latitude;
+			gpsInfo.lon = gpsPos.coords.longitude;
+			gpsInfo.acu = gpsPos.coords.accuracy;
+			gpsInfo.last = new Date();
+			window.console.log('Dados GPS salvos ;-)');
+			gpsCenter();
+		}
+
+		/** GPS Error Callback function
+		 * @param {Object} gpsError https://developer.mozilla.org/en-US/docs/Web/API/GeolocationPositionError
+		 */
+		function gpsError(gpsError) {
+			btnEnable('idOpenGps', false);  /// gpsError.code == gpsError.PERMISSION_DENIED);
+			// Todo: switch(gpsError.code)
+			//window.console.error(gpsError);
+			gpsInfo.error.msg = gpsError.message;
+			gpsInfo.error.msg.code = gpsError.code
+			console.error(`Não foi possível recuperar sua localização devido '${gpsError.message}' [${gpsError.code}].`);
+		}
+		/** UI to active GPS and center to its current location
+		 * @param {string} sId element's id
+		 * @param {bool} bEnable
+		 * @return {bool} true if activated | centered
+		 */
+		function gpsOpen() {
+			// https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API
+			if (!navigator.geolocation) {
+				btnEnable('idOpenGps', false);
+				alert('GPS não está disponível neste navegador.')
+				return false;
+			} /* Todo: else if (já ligado ){
+				centralizar no ponto
+			} else {  // ativar geolocation (pode usar watchPosition, se for mobile)
+				*/
+
+			navigator.geolocation.getCurrentPosition(gpsPosition, gpsError);
+			btnEnable('idOpenGps', false);
+			return true;
+			//window.console.warn('GPS no seguinte passo.');
+		}
+
+	</script>
+
+	<header>
+		<img src="./imagens/logo.png" alt="Arnia" id="logo">
+	</header>
+
+	<main>
+		<section id="area">
+			<div id="menu">
+				<div>
+					<button type="button" id="idDoMap" onClick="doMap()">Mostrar mapa</button>
+					<br>
+					<button type="button" id="idChangeLayer" onClick="changeLayer()">Alterar Camada</button>
+					<br>
+					<button type="button" id="idCenterMap" onClick="centerMap()">Centralizar</button>
+					<br>
+					<button type="button" id="idOpenGps" onClick="gpsOpen()">GPS</button>
+				</div>
+
+				<div id="dados">
+					<div id="entrada">
+						<div class="labelFloat">
+							<input type="text" id="idLon" onfocus="adicionarClasseFloat()" onblur="removerClasseFloat()"
+								name="idLon" value='-43.9360313'>
+							<label for="idLon" class="input-label">Longitude</label>
+							
+						</div>
+
+						<div class="labelFloat">
+							<input type="text" id="idLat" onfocus="adicionarClasseFloat()" onblur="removerClasseFloat()"
+								name="idLat" value='-19.9315584'>
+							<label for="idLat" class="input-label">Latidude</label>
+							
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<div id="mapa">
+			<div id="idMapViewPort" style="width: 90%; min-width: 200px; height: 600px"> </div>
+		</div>
+	</main>
+
+	<footer>
+	</footer>
+
+	<script src="classFloat.js"></script>
+</body>
+
+</html>
