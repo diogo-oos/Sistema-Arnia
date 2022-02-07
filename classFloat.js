@@ -4,11 +4,11 @@ var eidLon = document.getElementById('idLon');
 var eidLat = document.getElementById('idLat');
 
 function verificarValor() {
-    if (eidLon.value != 0) {
+    if (eidLon.value != "") {
         eidLon.classList.add('float');
     }
     
-    if (eidLat.value != 0) {
+    if (eidLat.value != "") {
         eidLat.classList.add('float');
     }
     

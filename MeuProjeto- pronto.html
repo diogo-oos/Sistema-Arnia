@@ -103,9 +103,18 @@
 				}),
 			}));
 
+			olFeatureCenter = new ol.Feature();
+			olFeatureCenter.setStyle(new ol.style.Style({
+				image: new ol.style.Circle({
+					radius: 6,
+					fill: new ol.style.Fill({ color: 'red', }),
+					stroke: new ol.style.Stroke({ color: '#fff', width: 1, }),  // Shortcut 3-digits = #ffFFff
+				}),
+			}));
+
 			const olGpsLayer = new ol.layer.Vector({
 				map: olMap,
-				source: new ol.source.Vector({ features: [gpsInfo.feature], }),
+				source: new ol.source.Vector({ features: [gpsInfo.feature, olFeatureCenter], }),
 			});
 		}
 		/** Disable/enable an element
@@ -124,7 +133,7 @@
 				olMap.getView().setCenter(aCenter);
 				console.log('Mapa centralizado: ' + aCenter);
 				let p = new ol.geom.Point(aCenter);
-				gpsInfo.feature.setGeometry(p);
+				olFeatureCenter.setGeometry(p);
 			}
 		}
 
